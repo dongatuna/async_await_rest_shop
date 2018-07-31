@@ -122,6 +122,15 @@ module.exports = {
                 error
             });
         }
+    },
+
+    deleteOrder: async(req, res, next)=>{
+        try{
+            
+            Order.remove({_id:req.params.id});
+        }catch(error){
+
+        }
     }
 
 }

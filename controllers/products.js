@@ -1,17 +1,19 @@
 const mongoose = require('mongoose');
 const Product = require('../models/product');
+//const multer = require('multer');
 
 module.exports = {
 
     createProduct: async (req, res, next)=>{
         try{
+           
             const {name, price, productImage} = req.value.body;
 
             const newProduct = new Product({
                 _id: new mongoose.Types.ObjectId(),
-                name,
-                price,
-                //productImage:req.file.path
+                name:req.value.body.name,
+                price: req.value.body.price,
+                productImage:req.file.path
             });
 
             await newProduct.save();
@@ -22,7 +24,8 @@ module.exports = {
 
                 createdProduct:{
                     name: newProduct.name,
-                    price: newProduct.price                    
+                    price: newProduct.price,
+                    productImage:newProduct.productImage                  
                 },
 
                 request:{
@@ -124,17 +127,22 @@ module.exports = {
         try{
             const productId = req.params.id;
 
-            await Product.remove({_id: productId});
+            const result = await Product.remove({_id: productId});
 
-            res.status(200).json({
-                message: "Product deleted",
-                request:{
-                    message:"Use the url below to post a new product",
-                    type: "POST",
-                    url: "http://localhost:3000/products",
-                    body:{name:"String", price: "Number"}
-                }
-            });
+            //console.log("Was the result deleted? ", result);
+
+            if(result.ok){
+                res.status(200).json({
+                    message: "Product deleted",
+                    request:{
+                        message:"Use the url below to post a new product",
+                        type: "POST",
+                        url: "http://localhost:3000/products",
+                        body:{name:"String", price: "Number"}
+                    }
+                });
+            }
+            
 
         }catch(error){
             res.status(500).json({

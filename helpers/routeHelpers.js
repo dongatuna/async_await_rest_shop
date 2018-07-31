@@ -1,6 +1,7 @@
 const Joi = require('joi');
 
-module.exports = {
+module.exports = {   
+
     validateBody: (schema)=>{
         return(req, res, next)=>{
             const result = Joi.validate(req.body, schema);
@@ -12,6 +13,8 @@ module.exports = {
             if(!req.value){req.value = {};}
 
             req.value["body"] = result.value;
+
+            console.log(req.value['body']);
             next();
         }
     },
