@@ -4,14 +4,15 @@ const router = require("express-promise-router")();
 const {validateBody, schemas } = require("../helpers/routeHelpers");
 
 const OrdersController = require("../controllers/orders");
+const checkAuth = require('../middleware/check-auth');
 
 router.route('/post')
-    .post(validateBody(schemas.orderSchema), OrdersController.postOrder);
+    .post(checkAuth, validateBody(schemas.orderSchema), OrdersController.postOrder);
 
 router.route('/')
-    .get(OrdersController.getOrders);
+    .get(checkAuth, OrdersController.getOrders);
 
 router.route('/:id')
-    .get(OrdersController.getOrderById);
+    .get(checkAuth, OrdersController.getOrderById);
 
 module.exports =router;

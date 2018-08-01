@@ -1,7 +1,7 @@
 const express = require('express');
 const router = require('express-promise-router')();
 const multer = require('multer');
-
+const checkAuth = require('../middleware/check-auth');
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
@@ -33,7 +33,7 @@ const {validateBody, schemas } = require("../helpers/routeHelpers");
 const ProductsController = require('../controllers/products');
 
 router.route('/post')
-.post(upload.single('productImage'), validateBody(schemas.productSchema), ProductsController.createProduct);
+.post(checkAuth, upload.single('productImage'), validateBody(schemas.productSchema), ProductsController.createProduct);
 
 router.route('/')
 .get(ProductsController.getProducts);
@@ -42,9 +42,9 @@ router.route('/:id')
 .get(ProductsController.getProductById);
 
 router.route('/:id')
-.delete(ProductsController.deleteProduct);
+.delete(checkAuth, ProductsController.deleteProduct);
 
 router.route('/:id')
-.patch(validateBody(schemas.productSchema), ProductsController.updateProduct);
+.patch(checkAuth, validateBody(schemas.productSchema), ProductsController.updateProduct);
 
 module.exports = router;

@@ -6,12 +6,22 @@ const {JWT_SECRET} = require('../configuration');
 //create a signToken function
 
 signToken = (user) =>{
-    return JWT.sign({
-        iss: "Don",
-        sub: user.id,
-        iat: new Date().getTime(), //current time
-        exp: new Date().setDate(new Date().getDate()+1) //current time + 1 day ahead
-    }, JWT_SECRET);
+    return JWT.sign(        
+        {
+            iss: "Don",
+            sub: user.id,
+            iat: new Date().getTime(), //current time
+            exp: new Date().setDate(new Date().getDate()+1), //current time + 1 day ahead
+            email: user.email,
+            userId: user._id
+        },
+        JWT_SECRET
+        // ,
+        // {
+        //     email: user.email,
+        //     userId:user._id
+        // }
+    );
 }
 module.exports = {
 
@@ -37,6 +47,7 @@ module.exports = {
             //save the user
             await newUser.save();
 
+
             //Generate the token
             const token = signToken(newUser);
             console.log(token);
@@ -44,15 +55,17 @@ module.exports = {
             res.status(200).json({token});
             
         }catch(error){
-
+            res.status(401).json({
+                message: "Auth failed"
+            });
         }
     },
 
     signIn: async(req, res, next)=>{
         //The signin is handled by passport.js - 
         
-        const token = signToken(req.user);
-        console.log(token);
+       const token = signToken(req.user);
+        //console.log(token);
 
         res.status(200).json({token});
     },
