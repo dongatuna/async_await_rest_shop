@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Product = require('../models/product');
-//const multer = require('multer');
+const multer = require('multer');
 
 module.exports = {
 

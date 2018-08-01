@@ -8,7 +8,7 @@ const orderRoutes = require('./routes/orders');
 mongoose.Promise = global.Promise;
 //connect to the database
 mongoose.connect('mongodb://localhost/restshop');
-
+//"C:\Program Files\MongoDB\Server\4.0\bin\mongod.exe"
 //Initialize express and save it in a constant called app
 const app = express();
 
@@ -34,7 +34,7 @@ app.use((req, res, next) => {
   });
 
 //set up the 3 routes of order, product and user
-// app.use('/users', userRoutes);
+app.use('/users', userRoutes);
 app.use('/orders', orderRoutes);
 app.use('/products', require('./routes/products'));
 

@@ -33,9 +33,8 @@ module.exports = {
 
         orderSchema: Joi.object().keys({
             //product: Joi.object({productSchema}).required(),
-            product: Joi.string().required(),
-            quantity: Joi.number()
-            
+            product: Joi.string().alphanum().required(),
+            quantity: Joi.number()            
         })
 
     }

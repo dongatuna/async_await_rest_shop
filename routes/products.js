@@ -32,9 +32,8 @@ const upload = multer({
 const {validateBody, schemas } = require("../helpers/routeHelpers");
 const ProductsController = require('../controllers/products');
 
-
 router.route('/post')
-.post( upload.single('productImage'), validateBody(schemas.productSchema),ProductsController.createProduct);
+.post(upload.single('productImage'), validateBody(schemas.productSchema), ProductsController.createProduct);
 
 router.route('/')
 .get(ProductsController.getProducts);
@@ -47,7 +46,5 @@ router.route('/:id')
 
 router.route('/:id')
 .patch(validateBody(schemas.productSchema), ProductsController.updateProduct);
-
-
 
 module.exports = router;
