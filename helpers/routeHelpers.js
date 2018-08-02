@@ -14,13 +14,14 @@ module.exports = {
 
             req.value["body"] = result.value;
 
-            console.log(req.value['body']);
+            //console.log(req.value['body']);
             next();
         }
     },
 
     schemas:{
         userSchema: Joi.object().keys({
+            //signupmethod: Joi.string().required(),
             email: Joi.string().email().required(),
             password: Joi.string().required()
         }),

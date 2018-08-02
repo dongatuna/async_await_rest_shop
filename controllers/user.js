@@ -16,11 +16,7 @@ signToken = (user) =>{
             userId: user._id
         },
         JWT_SECRET
-        // ,
-        // {
-        //     email: user.email,
-        //     userId:user._id
-        // }
+   
     );
 }
 module.exports = {
@@ -31,23 +27,31 @@ module.exports = {
             //check if the user exists
             const result = await User.findOne({email});
             
+            console.log(email, password);
+
             if(result){
                 res.status(409).json({
                     message: "The email has been taken"
                 });
             }
 
+            console.log("User has not been saved...");
             //create new user
             const newUser = new User({
                 _id: new mongoose.Types.ObjectId(),
-                email,
-                password
+                signupmethod: 'local',
+                local:{
+                    email,
+                    password
+                }
+                
             });
 
+            console.log("newUser Email ", newUser.email, "Password", newUser.password);
             //save the user
             await newUser.save();
 
-
+            //console.log("new user ", newUser);
             //Generate the token
             const token = signToken(newUser);
             console.log(token);
@@ -56,7 +60,7 @@ module.exports = {
             
         }catch(error){
             res.status(401).json({
-                message: "Auth failed"
+                message: "Authentication failed"
             });
         }
     },
@@ -67,6 +71,14 @@ module.exports = {
        const token = signToken(req.user);
         //console.log(token);
 
+        res.status(200).json({token});
+    },
+
+    googleOAuth: async(req, res, next)=>{
+        //Generate token
+        console.log("got here");
+
+        const token = signToken(req.user);
         res.status(200).json({token});
     },
 
