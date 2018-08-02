@@ -68,6 +68,37 @@ passport.use('googleToken', new GooglePlusTokenStrategy({
     }
     
 }));
+
+//FACEBOOK STRATEGY - to sign up new users or log in returning users
+
+passport.use(new FacebookTokenStrategy({
+    //add configurations
+    clientID: "",
+    clientSecret: " "
+}, async(accessToken, refreshToken, profile, done)=>{
+    //check if the user is in our database using the profile.id
+    const existingUser = await find({"facebook.id":profile.id});
+
+    //if the user exist, return the user
+    if(existingUser){
+        return done(null, existingUser);
+    }
+
+    //otherwise, create a new user
+    const newUser = new User({
+        _id: new mongoose.Types.ObjectId(),
+        signupmethod: 'facebook',
+        facebook:{
+            id: profile.id,
+            email: profile.emails[0].value
+        }        
+    });
+
+    //save the newly created user and return him 
+    await newUser.save();
+    done(null, newUser);
+
+}));
 //LOCAL STRATEGY - to log in users
 
 passport.use(new LocalStrategy({
