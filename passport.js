@@ -4,7 +4,8 @@ const JwtStrategy =  require('passport-jwt').Strategy;
 const {ExtractJwt} = require('passport-jwt');
 const LocalStrategy = require('passport-local').Strategy;
 const GooglePlusTokenStrategy = require('passport-google-plus-token');
-const {JWT_SECRET} = require('./configuration');
+const FacebookTokenStrategy = require('passport-facebook-token');
+const config = require('./configuration');
 
 const User = require("./models/user");
 
@@ -13,7 +14,7 @@ const User = require("./models/user");
 
 passport.use(new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-    secretOrKey:JWT_SECRET
+    secretOrKey:config.JWT_SECRET
 },  async(payload, done)=>{
     try{
         //find the user specified in the token
@@ -36,8 +37,8 @@ passport.use(new JwtStrategy({
 //GOOGLE OAUTH STRATEGY
 
 passport.use('googleToken', new GooglePlusTokenStrategy({
-    clientID: "510465647938-dv862rsa4r8rmaarteqp6rpakq4t0eqo.apps.googleusercontent.com",
-    clientSecret: "vA6cSFbARbn6vq02FsdQdxcq"
+    clientID: config.oauth.google.clientID,
+    clientSecret: config.oauth.google.clientSecret
 }, async(accessToken, refreshToken, profile, done)=>{
 
     try{
@@ -71,32 +72,43 @@ passport.use('googleToken', new GooglePlusTokenStrategy({
 
 //FACEBOOK STRATEGY - to sign up new users or log in returning users
 
-passport.use(new FacebookTokenStrategy({
+passport.use("facebookToken",new FacebookTokenStrategy({
     //add configurations
-    clientID: "",
-    clientSecret: " "
+    clientID: config.oauth.facebook.clientID,
+    clientSecret: config.oauth.facebook.clientSecret
 }, async(accessToken, refreshToken, profile, done)=>{
-    //check if the user is in our database using the profile.id
-    const existingUser = await find({"facebook.id":profile.id});
+    try{
 
-    //if the user exist, return the user
-    if(existingUser){
-        return done(null, existingUser);
+        console.log("This is the access Token ", accessToken);
+        console.log("This is the refresh Token ", refreshToken);
+        console.log("This is the profile ", profile);
+        //check if the user is in our database using the profile.id
+        const existingUser = await User.findOne({"facebook.id":profile.id});
+
+        console.log(`${existingUser} is an existing user?`);
+        //if the user exist, return the user
+        if(existingUser){
+            return done(null, existingUser);
+        }
+
+        //otherwise, create a new user
+        const newUser = new User({
+            _id: new mongoose.Types.ObjectId(),
+            signupmethod: 'facebook',
+            facebook:{
+                id: profile.id,
+                email: profile.emails[0].value
+            }        
+        });
+
+        console.log("This is a new user ", newUser);
+        //save the newly created user and return him 
+        await newUser.save();
+        done(null, newUser);
+
+    }catch(error){
+        done(error, false, error.message);
     }
-
-    //otherwise, create a new user
-    const newUser = new User({
-        _id: new mongoose.Types.ObjectId(),
-        signupmethod: 'facebook',
-        facebook:{
-            id: profile.id,
-            email: profile.emails[0].value
-        }        
-    });
-
-    //save the newly created user and return him 
-    await newUser.save();
-    done(null, newUser);
 
 }));
 //LOCAL STRATEGY - to log in users

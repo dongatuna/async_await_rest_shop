@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const User = require('../models/user');
 const JWT = require('jsonwebtoken');
-const {JWT_SECRET} = require('../configuration');
+const config = require('../configuration');
 
 //create a signToken function
 
@@ -15,7 +15,7 @@ signToken = (user) =>{
             email: user.email,
             userId: user._id
         },
-        JWT_SECRET
+        config.JWT_SECRET
    
     );
 }
@@ -74,9 +74,21 @@ module.exports = {
         res.status(200).json({token});
     },
 
+    facebookOAuth: async(req, res, next)=>{
+        console.log("Facebook authentication... ");
+
+        console.log("req.user", req.user);
+
+        const token = signToken(req.user);
+        res.status(200).json({token});
+
+    },
+
     googleOAuth: async(req, res, next)=>{
         //Generate token
-        console.log("got here");
+        console.log("Google got me here");
+
+        console.log(req.user);
 
         const token = signToken(req.user);
         res.status(200).json({token});
